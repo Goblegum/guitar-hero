@@ -1,47 +1,68 @@
 import pygame
 import sqlite3
 import time
-import RPI.GPIO as GPIO
-from grove.grove_button import GroveButton
 
-# 1. Initialisation de Pygame
 pygame.init()
 info = pygame.display.Info()
 
-# 2. Création de la fenêtre (largeur, hauteur)
-
 screen_w = info.current_w
 screen_h = info.current_h
-
 screen = pygame.display.set_mode((screen_w, screen_h))
 pygame.display.set_caption("Guitar Hero")
 
-# Horloge pour contrôler les FPS (images par seconde)
 clock = pygame.time.Clock()
 play = True
 
-# 3. Boucle principale du jeu
+police_menu = pygame.font.Font(None, 42)
+largeur_bouton = 280
+hauteur_bouton = 60
+espacement = 16
+
+boutons_menu = [
+    ("Jouer", (55, 95, 220)),
+    ("Voir les scores", (48, 52, 66)),
+    ("S’identifier", (48, 52, 66)),
+]
+
+hauteur_menu = 3 * hauteur_bouton + 2 * espacement
+x_menu = (screen_w - largeur_bouton) // 2
+y_menu = (screen_h - hauteur_menu) // 2
+
+curseur_actuel = pygame.SYSTEM_CURSOR_ARROW
+
 while play:
-    # Gestion des événements (clavier, souris, fermeture)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             play = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                play = False
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            play = False
 
-    # Remplissage de l'écran en noir (code couleur RGB)
     screen.fill((0, 0, 0))
+    position_souris = pygame.mouse.get_pos()
+    survole_bouton = False
 
-    # --- Dessinez vos objets ici ---
+    for index, (libelle, couleur) in enumerate(boutons_menu):
+        y = y_menu + index * (hauteur_bouton + espacement)
+        bouton = pygame.Rect(x_menu, y, largeur_bouton, hauteur_bouton)
 
-    # Mise à jour de l'affichage
+        if bouton.collidepoint(position_souris):
+            survole_bouton = True
+
+        pygame.draw.rect(screen, couleur, bouton, border_radius=12)
+        texte = police_menu.render(libelle, True, (255, 255, 255))
+        screen.blit(texte, texte.get_rect(center=bouton.center))
+
+    curseur = pygame.SYSTEM_CURSOR_ARROW
+    if survole_bouton:
+        curseur = pygame.SYSTEM_CURSOR_HAND
+
+    if curseur != curseur_actuel:
+        pygame.mouse.set_cursor(curseur)
+        curseur_actuel = curseur
+
     pygame.display.flip()
-    
-    # Limite à 60 images par seconde
     clock.tick(60)
 
-# 4. Fermeture propre
 pygame.quit()
 
 
