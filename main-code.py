@@ -23,30 +23,23 @@ clock = pygame.time.Clock()
 
 # Global
 play = True
-curseur_actuel = pygame.SYSTEM_CURSOR_ARROW
+
 # Formulaire
 font = pygame.font.Font(None, 32)
 champ_actif = False
 id_input = ""
-form = False
+form = True
 
 # Menu
-menu = True
-police_menu = pygame.font.Font(None, 42)
+menu = False
 largeur_bouton = 280
 hauteur_bouton = 60
 espacement = 16
-
-boutons_menu = [
-    ("Jouer", (55, 95, 220)),
-    ("Voir les scores", (48, 52, 66)),
-    ("S’identifier", (48, 52, 66)),
-]
+y = 0
 
 hauteur_menu = 3 * hauteur_bouton + 2 * espacement
 x_menu = (screen_w - largeur_bouton) // 2
 y_menu = (screen_h - hauteur_menu) // 2
-y = y_menu + index * (hauteur_bouton + espacement)
 
 # Boucle principale du jeu
 while play:
@@ -57,19 +50,81 @@ while play:
     for event in pygame.event.get():
         # Quitter le jeu
         if event.type == pygame.QUIT:
-            menu = False
             play = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                menu = False
                 play = False
-        # Menu
-        if menu == True:
-            if pygame.Rect(x_menu, y, largeur_bouton, hauteur_bouton).collidepoint(position_souris):
+
+    # Affichage
+    screen.fill("white")
+
+    # Menu
+    while menu:
+
+        # Variables
+        position_souris = pygame.mouse.get_pos()
+
+        # Evenements
+        for event in pygame.event.get():
+            # Quitter le jeu
+            if event.type == pygame.QUIT:
+                menu = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    menu = False
+            if pygame.Rect(x_menu, y1, largeur_bouton, hauteur_bouton).collidepoint(position_souris):
                 survole_bouton = True
-        # Formulaire
-        if form == True:
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            elif pygame.Rect(x_menu, y2, largeur_bouton, hauteur_bouton).collidepoint(position_souris):
+                survole_bouton = True
+            elif pygame.Rect(x_menu, y3, largeur_bouton, hauteur_bouton).collidepoint(position_souris):
+                survole_bouton = True
+            else:
+                survole_bouton = False
+
+        # Affichage
+        screen.fill("white")
+
+        y1 = y_menu + 0 * (hauteur_bouton + espacement)
+        pygame.draw.rect(screen, ("blue"), pygame.Rect(x_menu, y1, largeur_bouton, hauteur_bouton), border_radius=12)
+        texte = font.render("Jouer", True, (255, 255, 255))
+        screen.blit(texte, texte.get_rect(center=pygame.Rect(x_menu, y1, largeur_bouton, hauteur_bouton).center))
+
+        y2 = y_menu + 1 * (hauteur_bouton + espacement)
+        pygame.draw.rect(screen, ("grey"), pygame.Rect(x_menu, y2, largeur_bouton, hauteur_bouton), border_radius=12)
+        texte = font.render("Voir les scores", True, (255, 255, 255))
+        screen.blit(texte, texte.get_rect(center=pygame.Rect(x_menu, y2, largeur_bouton, hauteur_bouton).center))
+        
+        y3 = y_menu + 2 * (hauteur_bouton + espacement)
+        pygame.draw.rect(screen, ("grey"), pygame.Rect(x_menu, y3, largeur_bouton, hauteur_bouton), border_radius=12)
+        texte = font.render("S'identifier", True, (255, 255, 255))
+        screen.blit(texte, texte.get_rect(center=pygame.Rect(x_menu, y3, largeur_bouton, hauteur_bouton).center))
+        
+        if survole_bouton:
+            curseur = pygame.SYSTEM_CURSOR_HAND
+            pygame.mouse.set_cursor(curseur)
+        else:
+            curseur = pygame.SYSTEM_CURSOR_ARROW
+            pygame.mouse.set_cursor(curseur)
+
+        # Mise à jour de l'affichage
+        pygame.display.flip()
+            
+        # Limite à 60 images par seconde
+        clock.tick(60)
+
+    # Formulaire
+    while form:
+        # Variables
+
+        # Evenements
+        for event in pygame.event.get():
+            # Quitter le jeu
+            if event.type == pygame.QUIT:
+                form = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    form = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 champ_actif = pygame.Rect(140, 80, 240, 40).collidepoint(event.pos)
             elif event.type == pygame.KEYDOWN and champ_actif:
                 if event.key == (pygame.K_RETURN or pygame.K_KP_ENTER):
@@ -81,25 +136,9 @@ while play:
                     if event.unicode.isprintable():
                         id_input += event.unicode
 
-    # Affichage
-    screen.fill("white")
+        # Affichage
+        screen.fill("white")
 
-    # Menu
-    for index, (libelle, couleur) in enumerate(boutons_menu):
-        pygame.draw.rect(screen, couleur, pygame.Rect(x_menu, y, largeur_bouton, hauteur_bouton), border_radius=12)
-        texte = police_menu.render(libelle, True, (255, 255, 255))
-        screen.blit(texte, texte.get_rect(center=bouton.center))
-    
-    curseur = pygame.SYSTEM_CURSOR_ARROW
-    if survole_bouton:
-        curseur = pygame.SYSTEM_CURSOR_HAND
-    
-    if curseur != curseur_actuel:
-        pygame.mouse.set_cursor(curseur)
-        curseur_actuel = curseur
-
-    # Formulaire
-    while form:
         if champ_actif == False:
             txt = "Identifiant"
         else:
@@ -109,6 +148,12 @@ while play:
         pygame.draw.rect(screen, "green", pygame.Rect(180, 160, 140, 45), border_radius=8)
         texte = font.render("Envoyer", True, "white")
         screen.blit(texte, texte.get_rect(center=pygame.Rect(180, 160, 140, 45).center))
+
+        # Mise à jour de l'affichage
+        pygame.display.flip()
+            
+        # Limite à 60 images par seconde
+        clock.tick(60)
 
     # Mise à jour de l'affichage
     pygame.display.flip()
