@@ -28,10 +28,10 @@ play = True
 font = pygame.font.Font(None, 32)
 champ_actif = False
 id_input = ""
-form = True
+form = False
 
 # Menu
-menu = False
+menu = True
 largeur_bouton = 280
 hauteur_bouton = 60
 espacement = 16
