@@ -40,3 +40,54 @@ while play:
 
 # 4. Fermeture propre
 pygame.quit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#partie de Bilal
+
+
+
+import RPI.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
+
+GPIO.setup(num_pin, GPIO.IN)
+
+from grove.grove_button import GroveButton
+
+button = GroveButton(22)
+
+def on_press(t):
+
+
+def on_release(t):
+
+
+button.on_press = on_press
+button.on_release = on_release
+
+
+import time
+import pygame
+
+pygame.mixer.init()
+pygame.mixer.music.load("ACDC - Highway to Hell (Official Video).mp3")  # Fonctionne aussi avec un fichier .wav
+pygame.mixer.music.play()
+
+while pygame.mixer.music.get_busy():
+    time.sleep(0.5)
+
+
